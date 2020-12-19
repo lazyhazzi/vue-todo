@@ -9,23 +9,22 @@
 
 <script>
 export default {
-  data: function() {
+  data() {
     return {
       newTodoItem: ""
     };
   },
   methods: {
-    addTodo: function() {
+    addTodo() {
       if (this.newTodoItem !== "") {
-        let obj = {
-          completed: false,
-          item: this.newTodoItem
-        };
-        localStorage.setItem(this.newTodoItem, JSON.stringify(obj));
+        const text = this.newTodoItem.trim();
+        this.$store.commit("addOneItem", text);
         this.clearInput();
+      } else {
+        alert("할 일을 적어주세요.");
       }
     },
-    clearInput: function() {
+    clearInput() {
       this.newTodoItem = "";
     }
   }

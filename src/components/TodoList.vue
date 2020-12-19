@@ -1,8 +1,12 @@
 <template>
   <div>
-    <ul>
-      <li v-for="(todoItem, index) in todoItems" v-bind:key="todoItem.item" class="shadow">
-        <button type="button" v-on:click="toggleComplete(todoItem)" class="checkBtn">
+    <transition-group name="list" tag="ul">
+      <li
+        v-for="(todoItem, index) in this.$store.state.todoItems"
+        v-bind:key="todoItem.item"
+        class="shadow"
+      >
+        <button type="button" v-on:click="toggleComplete(todoItem, index)" class="checkBtn">
           <i class="fas fa-check" v-bind:class="{checkBtnCompleted: todoItem.completed}"></i>
         </button>
         <span v-bind:class="{textCompleted: todoItem.completed}">{{todoItem.item}}</span>
@@ -10,39 +14,19 @@
           <i class="fas fa-trash-alt"></i>
         </button>
       </li>
-    </ul>
+    </transition-group>
   </div>
 </template>
 
 <script>
 export default {
-  data: function() {
-    return {
-      todoItems: []
-    };
-  },
+  props: ["propsdata"],
   methods: {
-    removeTodo: function(todoItem, index) {
-      console.log(todoItem, index);
-      localStorage.removeItem(todoItem);
-      this.todoItems.splice(index, 1);
+    removeTodo(todoItem, index) {
+      this.$store.commit("removeOneItem", { todoItem, index });
     },
-    toggleComplete: function(todoItem) {
-      todoItem.completed = !todoItem.completed;
-      localStorage.removeItem(todoItem.item);
-      localStorage.setItem(todoItem.item, JSON.stringify(todoItem));
-      // console.log(todoItem, index);
-    }
-  },
-  created: function() {
-    if (localStorage.length > 0) {
-      for (let i = 0; i < localStorage.length; i++) {
-        if (localStorage.key(i) !== "loglevel:webpack-dev-server") {
-          this.todoItems.push(
-            JSON.parse(localStorage.getItem(localStorage.key(i)))
-          );
-        }
-      }
+    toggleComplete(todoItem, index) {
+      this.$store.commit("toggleOneItem", { todoItem, index });
     }
   }
 };
@@ -82,5 +66,16 @@ li {
 .textCompleted {
   text-decoration: line-through;
   color: #b3adad;
+}
+
+/* List Transition Effect */
+.list-enter-active,
+.list-leave-active {
+  transition: all 1s;
+}
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateY(30px);
 }
 </style>
